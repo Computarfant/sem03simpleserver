@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"sync"
+
+	"github.com/Computarfant/is105sem03/mycrypt"
 )
 
 func main() {
@@ -36,11 +38,13 @@ func main() {
 						}
 						return // fra for løkke
 					}
-					switch msg := string(buf[:n]); msg {
-  				        case "ping":
+					dekryptertMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, len(mycrypt.ALF_SEM03)-4)
+					log.Println("Dekrypter melding: ", string(dekryptertMelding))
+					switch msg := string(dekryptertMelding); msg {
+					case "ping":
 						_, err = c.Write([]byte("pong"))
 					default:
-						_, err = c.Write(buf[:n])
+						_, err = c.Write([]byte(msg))
 					}
 					if err != nil {
 						if err != io.EOF {
@@ -53,4 +57,5 @@ func main() {
 		}
 	}()
 	wg.Wait()
+
 }
