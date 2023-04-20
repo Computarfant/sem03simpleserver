@@ -45,31 +45,38 @@ func main() {
 					dekryptertMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, -4)
 					log.Println("Dekrypter melding: ", string(dekryptertMelding))
 
-					switch msg := string(dekryptertMelding); msg {
-					case "ping":
-						svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, 4)
-						_, err = conn.Write([]byte(string(svar)))
-					case strings.HasPrefix(msg, "Kjevik"):
-						fields := strings.Split(msg, ";")
-						if len(fields) != 4 || fields[3] == "" {
+					if strings.HasPrefix(string(dekryptertMelding), "Kjevik") {
+						fields := strings.Split(string(dekryptertMelding), ";")
+						if len(fields) >= 4 {
+							celsius, err := strconv.ParseFloat(fields[3], 64)
+							if err != nil {
+								log.Println(err)
+								continue
+							}
+							fahrenheit := conv.CelsiusToFahrenheit(celsius)
+							svar := mycrypt.Krypter([]rune(fmt.Sprintf("%s;%s;%s;%.1f\n", fields[0], fields[1], fields[2], fahrenheit)), mycrypt.ALF_SEM03, 4)
+							_, err = conn.Write([]byte(string(svar)))
+							if err != nil {
+								log.Println(err)
+								return // from for loop
+							}
+						} else {
+							log.Println("Invalid input:", string(dekryptertMelding))
 							continue
 						}
-						celsius, err := strconv.ParseFloat(fields[3], 64)
+					} else {
+						switch msg := string(dekryptertMelding); msg {
+						case "ping":
+							svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, 4)
+							_, err = conn.Write([]byte(string(svar)))
+						default:
+							svar := mycrypt.Krypter([]rune(msg), mycrypt.ALF_SEM03, 4)
+							_, err = conn.Write([]byte(string(svar)))
+						}
 						if err != nil {
-							return
-						}
-						fahrenheit := conv.CelsiusToFahrenheit(celsius)
-						svar := mycrypt.Krypter([]rune(fmt.Sprintf("%s;%s;%s;%.1f\n", fields[0], fields[1], fields[2], fahrenheit)), mycrypt.ALF_SEM03, 4)
-						_, err = conn.Write([]byte(string(svar)))
-					default:
-						svar := mycrypt.Krypter([]rune(msg), mycrypt.ALF_SEM03, 4)
-						_, err = conn.Write([]byte(string(svar)))
-					}
-					if err != nil {
-						if err != io.EOF {
 							log.Println(err)
+							return // from for loop
 						}
-						return // from for loop
 					}
 				}
 			}(conn)
