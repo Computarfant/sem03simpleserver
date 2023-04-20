@@ -1,11 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net"
+	"strconv"
+	"strings"
 	"sync"
 
+	"github.com/Computarfant/funtemps/conv"
 	"github.com/Computarfant/is105sem03/mycrypt"
 )
 
@@ -36,26 +40,39 @@ func main() {
 						if err != io.EOF {
 							log.Println(err)
 						}
-						return // fra for løkke
+						return // from for loop
 					}
-					dekryptertMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, len(mycrypt.ALF_SEM03)-4)
+					dekryptertMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, -4)
 					log.Println("Dekrypter melding: ", string(dekryptertMelding))
 					switch msg := string(dekryptertMelding); msg {
 					case "ping":
-						_, err = c.Write([]byte("pong"))
+						svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, 4)
+						_, err = c.Write([]byte(svar))
+					case strings.HasPrefix(msg, "Kjevik"):
+						fields := strings.Split(msg, ";")
+						if len(fields) != 4 || fields[3] == "" {
+							continue
+						}
+						celsius, err := strconv.ParseFloat(fields[3], 64)
+						if err != nil {
+							return
+						}
+						fahrenheit := conv.CelsiusToFahrenheit(celsius)
+						svar := mycrypt.Krypter([]rune(fmt.Sprintf("%s;%s;%s;%.1f\n", fields[0], fields[1], fields[2], fahrenheit)), mycrypt.ALF_SEM03, 4)
+						_, err = c.Write([]byte(svar))
 					default:
-						_, err = c.Write([]byte(msg))
+						svar := mycrypt.Krypter([]rune(msg), mycrypt.ALF_SEM03, 4)
+						_, err = c.Write([]byte(svar))
 					}
 					if err != nil {
 						if err != io.EOF {
 							log.Println(err)
 						}
-						return // fra for løkke
+						return // from for loop
 					}
 				}
 			}(conn)
 		}
 	}()
 	wg.Wait()
-
 }
