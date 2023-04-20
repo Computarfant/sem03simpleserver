@@ -55,15 +55,15 @@ func main() {
 							return
 						}
 						fahrenheit := conv.CelsiusToFahrenheit(celsius)
-						svar := mycrypt.Krypter([]rune(fmt.Sprintf("%s;%s;%s;%.1f\n", fields[0], fields[1], fields[2], fahrenheit)), mycrypt.ALF_SEM03, 4)
+						svar := mycrypt.Krypter([]rune(fmt.Sprintf("%s;%s;%s;%.1f\n", fields[0], fields[1], fields[2], fahrenheit)), mycrypt.ALF_SEM03, -4)
 						_, err = conn.Write([]byte(string(svar)))
 					} else {
 						switch msg := string(dekryptertMelding); msg {
 						case "ping":
-							svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, 4)
+							svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, -4)
 							_, err = conn.Write([]byte(string(svar)))
 						default:
-							svar := mycrypt.Krypter([]rune(msg), mycrypt.ALF_SEM03, 4)
+							svar := mycrypt.Krypter([]rune(msg), mycrypt.ALF_SEM03, -4)
 							_, err = conn.Write([]byte(string(svar)))
 						}
 					}
