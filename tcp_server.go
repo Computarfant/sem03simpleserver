@@ -45,8 +45,8 @@ func main() {
 					dekryptertMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, -4)
 					log.Println("Dekrypter melding: ", string(dekryptertMelding))
 
-					switch msg := string(dekryptertMelding); {
-					case strings.HasPrefix(msg, "ping"):
+					switch msg := string(dekryptertMelding); msg {
+					case "ping":
 						svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, 4)
 						_, err = conn.Write([]byte(string(svar)))
 					case strings.HasPrefix(msg, "Kjevik"):
