@@ -31,6 +31,8 @@ func main() {
 			if err != nil {
 				return
 			}
+			var x string
+
 			go func(c net.Conn) {
 				for {
 					buf := make([]byte, 1024)
@@ -54,9 +56,8 @@ func main() {
 								continue
 							}
 							fahrenheit := conv.CelsiusToFahrenheit(celsius)
-							x := fmt.Sprintf("%s;%s;%s;%.1f\n", fields[0], fields[1], fields[2], fahrenheit)
-							svar := mycrypt.Krypter([]rune(x), mycrypt.ALF_SEM03, 4)
-							_, err = conn.Write([]byte(string(svar)))
+							x = fmt.Sprintf("%s;%s;%s;%.1f\n", fields[0], fields[1], fields[2], fahrenheit)
+							_, err = conn.Write([]byte(x))
 							if err != nil {
 								log.Println(err)
 								return // from for loop
@@ -66,7 +67,8 @@ func main() {
 							continue
 						}
 					} else {
-						switch msg := string(dekryptertMelding); msg {
+						msg := string(dekryptertMelding)
+						switch msg {
 						case "ping":
 							svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, 4)
 							_, err = conn.Write([]byte(string(svar)))
