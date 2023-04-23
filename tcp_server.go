@@ -9,7 +9,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Computarfant/IS105/tree/main/fib/go/pkg/mod/github.com/uia-worker/is105sem03@v0.0.0-20230416140235-f3824ac768bb/mycrypt"
 	"github.com/Computarfant/funtemps/conv"
 	"github.com/Computarfant/is105sem03/mycrypt"
 )
@@ -57,8 +56,7 @@ func main() {
 								continue
 							}
 							fahrenheit := conv.CelsiusToFahrenheit(celsius)
-							x = fmt.Sprintf("%s;%s;%s;%.1f\n", fields[0], fields[1], fields[2], fahrenheit)
-							_, err = conn.Write([]byte(x))
+							x = fmt.Sprintf("%s;%s;%s;%.1f", fields[0], fields[1], fields[2], fahrenheit)
 							if err != nil {
 								log.Println(err)
 								return // from for loop
