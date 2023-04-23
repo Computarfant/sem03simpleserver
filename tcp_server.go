@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Computarfant/IS105/tree/main/fib/go/pkg/mod/github.com/uia-worker/is105sem03@v0.0.0-20230416140235-f3824ac768bb/mycrypt"
 	"github.com/Computarfant/funtemps/conv"
 	"github.com/Computarfant/is105sem03/mycrypt"
 )
@@ -43,8 +44,8 @@ func main() {
 						}
 						return // from for loop
 					}
-
-					dekryptertMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, -4)
+					fmt.Println([]rune(string(buf[:n])))
+					dekryptertMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, len(mycrypt.ALF_SEM03)-4)
 					log.Println("Dekrypter melding: ", string(dekryptertMelding))
 
 					if strings.HasPrefix(string(dekryptertMelding), "Kjevik") {
@@ -64,25 +65,22 @@ func main() {
 							}
 						} else {
 							log.Println("Invalid input:", string(dekryptertMelding))
-							continue
 						}
 					} else {
-						msg := string(dekryptertMelding)
-						switch msg {
-						case "ping":
-							svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, 4)
-							_, err = conn.Write([]byte(string(svar)))
-						case x:
-							svar := mycrypt.Krypter([]rune(x), mycrypt.ALF_SEM03, 4)
-							_, err = conn.Write([]byte(string(svar)))
-						default:
-							svar := mycrypt.Krypter([]rune(msg), mycrypt.ALF_SEM03, 4)
-							_, err = conn.Write([]byte(string(svar)))
-						}
-						if err != nil {
-							log.Println(err)
-							return // from for loop
-						}
+						x = dekryptertMelding
+					}
+					msg := string(dekryptertMelding)
+					switch msg {
+					case "ping":
+						svar := mycrypt.Krypter([]rune("pong"), mycrypt.ALF_SEM03, 4)
+						_, err = conn.Write([]byte(string(svar)))
+					default:
+						svar := mycrypt.Krypter([]rune(x), mycrypt.ALF_SEM03, 4)
+						_, err = conn.Write([]byte(string(svar)))
+					}
+					if err != nil {
+						log.Println(err)
+						return // from for loop
 					}
 				}
 			}(conn)
