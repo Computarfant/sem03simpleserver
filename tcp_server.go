@@ -65,7 +65,7 @@ func main() {
 							log.Println("Invalid input:", string(dekryptertMelding))
 						}
 					} else {
-						x = dekryptertMelding
+						x = string(dekryptertMelding)
 					}
 					msg := string(dekryptertMelding)
 					switch msg {
